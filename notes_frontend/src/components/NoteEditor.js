@@ -1,16 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 /**
  * PUBLIC_INTERFACE
  * NoteEditor
  * Form to create or edit a note.
+ * - Renders primary button text as "Create" when adding a new note, "Save" when editing.
+ * - Disables primary action when title/content are empty and shows helper text.
+ * - Uses onSave/onCancel props for parent-controlled flow.
  */
 export default function NoteEditor({ initialValue = null, onSave, onCancel, saving = false }) {
   const [title, setTitle] = useState(initialValue?.title || '');
   const [content, setContent] = useState(initialValue?.content || '');
   const [error, setError] = useState('');
 
+  // Determine whether we are editing an existing note or creating a new one
+  const isEditing = useMemo(() => Boolean(initialValue && initialValue.id), [initialValue]);
+  const primaryLabel = isEditing ? 'Save' : 'Create';
+
   useEffect(() => {
+    // Keep internal state in sync with parent-provided value
     setTitle(initialValue?.title || '');
     setContent(initialValue?.content || '');
   }, [initialValue]);
@@ -29,8 +37,16 @@ export default function NoteEditor({ initialValue = null, onSave, onCancel, savi
       return;
     }
     setError('');
-    await onSave({ title: title.trim(), content: content.trim() });
+    // Delegate save to parent. Parent decides create vs update.
+    await onSave?.({ title: title.trim(), content: content.trim() });
   };
+
+  const isDisabled = saving || !title.trim() || !content.trim();
+  const helper = !title.trim()
+    ? 'Please enter a title.'
+    : !content.trim()
+      ? 'Please enter content.'
+      : '';
 
   return (
     <form onSubmit={handleSubmit} style={{
@@ -49,6 +65,11 @@ export default function NoteEditor({ initialValue = null, onSave, onCancel, savi
           placeholder="Note title"
           style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border-color, #e5e7eb)' }}
         />
+        {!title.trim() && (
+          <small style={{ color: 'var(--error, #EF4444)', display: 'block', marginTop: 4 }}>
+            Title is required.
+          </small>
+        )}
       </div>
       <div style={{ marginBottom: 8 }}>
         <label htmlFor="content" style={{ display: 'block', marginBottom: 4 }}>Content</label>
@@ -60,14 +81,35 @@ export default function NoteEditor({ initialValue = null, onSave, onCancel, savi
           placeholder="Write your note..."
           style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border-color, #e5e7eb)', fontFamily: 'inherit' }}
         />
+        {!content.trim() && (
+          <small style={{ color: 'var(--error, #EF4444)', display: 'block', marginTop: 4 }}>
+            Content is required.
+          </small>
+        )}
       </div>
-      {error && <div role="status" aria-live="polite" style={{ color: 'var(--error, #EF4444)', marginBottom: 8 }}>{error}</div>}
+      {(error || helper) && (
+        <div role="status" aria-live="polite" style={{ color: 'var(--error, #EF4444)', marginBottom: 8 }}>
+          {error || helper}
+        </div>
+      )}
       <div style={{ display: 'flex', gap: 8 }}>
-        <button type="submit" className="theme-toggle" disabled={saving} aria-label="Save note" style={{ padding: '8px 12px' }}>
-          {saving ? 'Saving…' : 'Save'}
+        <button
+          type="submit"
+          className="theme-toggle"
+          disabled={isDisabled}
+          aria-label={`${primaryLabel} note`}
+          style={{ padding: '8px 12px' }}
+        >
+          {saving ? 'Saving…' : primaryLabel}
         </button>
         {onCancel && (
-          <button type="button" className="theme-toggle" onClick={onCancel} aria-label="Cancel edit" style={{ padding: '8px 12px', background: '#6b7280' }}>
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={onCancel}
+            aria-label="Cancel edit"
+            style={{ padding: '8px 12px', background: '#6b7280' }}
+          >
             Cancel
           </button>
         )}

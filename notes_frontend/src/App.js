@@ -59,16 +59,25 @@ function App() {
     }
   };
 
+  const startNewNote = () => {
+    // Open editor in "create" mode by clearing current editing state
+    setEditing(null);
+    // Also briefly set a placeholder object to force the editor to render if needed could be avoided since editor always shows.
+    // Here we rely on NoteEditor using initialValue===null as "create" mode which shows "Create" button.
+    // No-op otherwise.
+  };
+
   const handleSave = async (payload) => {
     try {
       setSaving(true);
-      if (editing) {
+      if (editing && editing.id) {
         await editNote(editing.id, payload);
         setToast('Note updated');
       } else {
         await addNote(payload);
         setToast('Note created');
       }
+      // Close editor after save
       setEditing(null);
     } catch (e) {
       setToast(e.message || 'Error saving note');
@@ -100,8 +109,8 @@ function App() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
           <h1 style={{ margin: 0, fontSize: 24 }}>Personal Notes</h1>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button 
-              className="theme-toggle" 
+            <button
+              className="theme-toggle"
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
             >
@@ -109,6 +118,9 @@ function App() {
             </button>
             <button className="theme-toggle" onClick={testSupabase} aria-label="Test Supabase">
               🔌 Test Supabase
+            </button>
+            <button className="theme-toggle" onClick={startNewNote} aria-label="Create new note">
+              ➕ New Note
             </button>
           </div>
         </div>
@@ -118,14 +130,14 @@ function App() {
         </div>
 
         <div style={{ textAlign: 'left', margin: '0 auto', maxWidth: 860, width: '100%' }}>
-          <div style={{ marginBottom: 16 }}>
+          <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
             <SearchBar value={search} onChange={setSearch} />
           </div>
 
           <NoteEditor
             initialValue={editing}
             onSave={handleSave}
-            onCancel={editing ? () => setEditing(null) : undefined}
+            onCancel={() => setEditing(null)}
             saving={saving}
           />
 
