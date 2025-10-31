@@ -7,14 +7,7 @@ import React from 'react';
  */
 export default function NoteItem({ note, onEdit, onDelete }) {
   return (
-    <div style={{
-      background: 'var(--bg-secondary, #f8f9fa)',
-      border: '1px solid var(--border-color, #e5e7eb)',
-      borderRadius: 10,
-      padding: 12,
-      marginBottom: 10,
-      textAlign: 'left'
-    }}>
+    <div className="card" style={{ padding: 12, marginBottom: 10, textAlign: 'left' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <h3 style={{ margin: 0 }}>{note.title}</h3>
         <small style={{ opacity: 0.7 }}>{new Date(note.updated_at || note.created_at).toLocaleString()}</small>
@@ -23,10 +16,10 @@ export default function NoteItem({ note, onEdit, onDelete }) {
         {note.content.length > 160 ? note.content.slice(0, 160) + '…' : note.content}
       </p>
       <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={() => onEdit(note)} className="theme-toggle" aria-label="Edit note" style={{ padding: '6px 10px' }}>
+        <button onClick={() => onEdit(note)} className="btn" aria-label="Edit note">
           ✏️ Edit
         </button>
-        <button onClick={() => onDelete(note)} className="theme-toggle" aria-label="Delete note" style={{ padding: '6px 10px', background: 'var(--error, #EF4444)' }}>
+        <button onClick={() => onDelete(note)} className="btn danger" aria-label="Delete note">
           🗑️ Delete
         </button>
       </div>

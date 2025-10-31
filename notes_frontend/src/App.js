@@ -62,9 +62,6 @@ function App() {
   const startNewNote = () => {
     // Open editor in "create" mode by clearing current editing state
     setEditing(null);
-    // Also briefly set a placeholder object to force the editor to render if needed could be avoided since editor always shows.
-    // Here we rely on NoteEditor using initialValue===null as "create" mode which shows "Create" button.
-    // No-op otherwise.
   };
 
   const handleSave = async (payload) => {
@@ -105,22 +102,19 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header" style={{ alignItems: 'stretch', padding: 24 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <header className="App-header">
+        <div className="header-top">
           <h1 style={{ margin: 0, fontSize: 24 }}>Personal Notes</h1>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div className="top-actions">
             <button
-              className="theme-toggle"
+              className="btn"
               onClick={toggleTheme}
               aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
             >
               {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
             </button>
-            <button className="theme-toggle" onClick={testSupabase} aria-label="Test Supabase">
+            <button className="btn secondary" onClick={testSupabase} aria-label="Test Supabase">
               🔌 Test Supabase
-            </button>
-            <button className="theme-toggle" onClick={startNewNote} aria-label="Create new note">
-              ➕ New Note
             </button>
           </div>
         </div>
@@ -129,11 +123,29 @@ function App() {
           {toast}
         </div>
 
-        <div style={{ textAlign: 'left', margin: '0 auto', maxWidth: 860, width: '100%' }}>
-          <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <SearchBar value={search} onChange={setSearch} />
+        <div className="container" style={{ textAlign: 'left' }}>
+          {/* Responsive top toolbar: Search (flex-1), New Note, Reload */}
+          <div className="app-toolbar mb-3" role="toolbar" aria-label="Notes toolbar">
+            <div className="flex-1" style={{ minWidth: 200 }}>
+              <SearchBar value={search} onChange={setSearch} />
+            </div>
+            <button
+              className="btn"
+              onClick={startNewNote}
+              aria-label="Create new note"
+            >
+              ➕ New Note
+            </button>
+            <button
+              className="btn"
+              onClick={reload}
+              aria-label="Reload notes"
+            >
+              ⟳ Reload
+            </button>
           </div>
 
+          {/* Editor with footer actions (Save/Create/Cancel are inside component) */}
           <NoteEditor
             initialValue={editing}
             onSave={handleSave}
@@ -142,15 +154,12 @@ function App() {
           />
 
           {loading && <p>Loading notes…</p>}
-          {error && <p style={{ color: 'var(--error, #EF4444)' }}>Error: {error.message}</p>}
+          {error && <p style={{ color: 'var(--error)' }}>Error: {error.message}</p>}
 
           <NotesList notes={notes} onEdit={handleEdit} onDelete={handleDelete} />
 
-          <div style={{ marginTop: 12 }}>
+          <div className="mt-3" aria-hidden="true">
             <small>Supabase: <strong>{sbStatus}</strong></small>
-            <button className="theme-toggle" onClick={reload} aria-label="Reload notes" style={{ marginLeft: 8, padding: '6px 10px' }}>
-              ⟳ Reload
-            </button>
           </div>
         </div>
       </header>

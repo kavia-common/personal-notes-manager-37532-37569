@@ -49,29 +49,27 @@ export default function NoteEditor({ initialValue = null, onSave, onCancel, savi
       : '';
 
   return (
-    <form onSubmit={handleSubmit} style={{
-      border: '1px solid var(--border-color, #e5e7eb)',
-      borderRadius: 10,
-      padding: 12,
-      textAlign: 'left',
-      marginBottom: 12
-    }}>
-      <div style={{ marginBottom: 8 }}>
+    <form
+      onSubmit={handleSubmit}
+      className="card"
+      style={{ padding: 12, textAlign: 'left', marginBottom: 12 }}
+    >
+      <div className="mb-2">
         <label htmlFor="title" style={{ display: 'block', marginBottom: 4 }}>Title</label>
         <input
           id="title"
           value={title}
           onChange={e => setTitle(e.target.value)}
           placeholder="Note title"
-          style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border-color, #e5e7eb)' }}
+          className="input"
         />
         {!title.trim() && (
-          <small style={{ color: 'var(--error, #EF4444)', display: 'block', marginTop: 4 }}>
+          <small style={{ color: 'var(--error)', display: 'block', marginTop: 4 }}>
             Title is required.
           </small>
         )}
       </div>
-      <div style={{ marginBottom: 8 }}>
+      <div className="mb-2">
         <label htmlFor="content" style={{ display: 'block', marginBottom: 4 }}>Content</label>
         <textarea
           id="content"
@@ -79,36 +77,35 @@ export default function NoteEditor({ initialValue = null, onSave, onCancel, savi
           value={content}
           onChange={e => setContent(e.target.value)}
           placeholder="Write your note..."
-          style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border-color, #e5e7eb)', fontFamily: 'inherit' }}
+          className="input"
+          style={{ fontFamily: 'inherit' }}
         />
         {!content.trim() && (
-          <small style={{ color: 'var(--error, #EF4444)', display: 'block', marginTop: 4 }}>
+          <small style={{ color: 'var(--error)', display: 'block', marginTop: 4 }}>
             Content is required.
           </small>
         )}
       </div>
       {(error || helper) && (
-        <div role="status" aria-live="polite" style={{ color: 'var(--error, #EF4444)', marginBottom: 8 }}>
+        <div role="status" aria-live="polite" style={{ color: 'var(--error)', marginBottom: 8 }}>
           {error || helper}
         </div>
       )}
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div className="editor-actions">
         <button
           type="submit"
-          className="theme-toggle"
+          className="btn"
           disabled={isDisabled}
           aria-label={`${primaryLabel} note`}
-          style={{ padding: '8px 12px' }}
         >
           {saving ? 'Saving…' : primaryLabel}
         </button>
         {onCancel && (
           <button
             type="button"
-            className="theme-toggle"
+            className="btn muted"
             onClick={onCancel}
             aria-label="Cancel edit"
-            style={{ padding: '8px 12px', background: '#6b7280' }}
           >
             Cancel
           </button>

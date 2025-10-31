@@ -12,14 +12,8 @@ export default function SearchBar({ value, onChange, placeholder = 'Search notes
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      style={{
-        width: '100%',
-        padding: '10px 12px',
-        borderRadius: 8,
-        border: '1px solid var(--border-color, #e5e7eb)',
-        outline: 'none',
-        marginBottom: 12
-      }}
+      className="input"
+      style={{ marginBottom: 0 }}
     />
   );
 }
