@@ -5,13 +5,12 @@ import React, { useEffect, useMemo, useState } from 'react';
  * NoteEditor
  * Form to create or edit a note.
  * - Renders primary button text as "Create" when adding a new note, "Save" when editing.
- * - Disables primary action when title/content are empty and shows helper text.
+ * - Disables primary action when title/content are empty (no inline error messages are shown).
  * - Uses onSave/onCancel props for parent-controlled flow.
  */
 export default function NoteEditor({ initialValue = null, onSave, onCancel, saving = false }) {
   const [title, setTitle] = useState(initialValue?.title || '');
   const [content, setContent] = useState(initialValue?.content || '');
-  const [error, setError] = useState('');
 
   // Determine whether we are editing an existing note or creating a new one
   const isEditing = useMemo(() => Boolean(initialValue && initialValue.id), [initialValue]);
@@ -23,30 +22,14 @@ export default function NoteEditor({ initialValue = null, onSave, onCancel, savi
     setContent(initialValue?.content || '');
   }, [initialValue]);
 
-  const validate = () => {
-    if (!title.trim()) return 'Title is required';
-    if (!content.trim()) return 'Content is required';
-    return '';
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const err = validate();
-    if (err) {
-      setError(err);
-      return;
-    }
-    setError('');
-    // Delegate save to parent. Parent decides create vs update.
+    // Prevent submission if fields are empty; we do not render inline errors
+    if (!title.trim() || !content.trim()) return;
     await onSave?.({ title: title.trim(), content: content.trim() });
   };
 
   const isDisabled = saving || !title.trim() || !content.trim();
-  const helper = !title.trim()
-    ? 'Please enter a title.'
-    : !content.trim()
-      ? 'Please enter content.'
-      : '';
 
   return (
     <form
@@ -63,11 +46,6 @@ export default function NoteEditor({ initialValue = null, onSave, onCancel, savi
           placeholder="Note title"
           className="input"
         />
-        {!title.trim() && (
-          <small style={{ color: 'var(--error)', display: 'block', marginTop: 4 }}>
-            Title is required.
-          </small>
-        )}
       </div>
       <div className="mb-2">
         <label htmlFor="content" style={{ display: 'block', marginBottom: 4 }}>Content</label>
@@ -80,17 +58,7 @@ export default function NoteEditor({ initialValue = null, onSave, onCancel, savi
           className="input"
           style={{ fontFamily: 'inherit' }}
         />
-        {!content.trim() && (
-          <small style={{ color: 'var(--error)', display: 'block', marginTop: 4 }}>
-            Content is required.
-          </small>
-        )}
       </div>
-      {(error || helper) && (
-        <div role="status" aria-live="polite" style={{ color: 'var(--error)', marginBottom: 8 }}>
-          {error || helper}
-        </div>
-      )}
       <div className="editor-actions">
         <button
           type="submit"
